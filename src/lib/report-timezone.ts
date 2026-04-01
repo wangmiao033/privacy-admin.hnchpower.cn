@@ -31,3 +31,22 @@ export function getLast7DaysBoundsUtc(
   const start = addDays(yesterdayStart, -6);
   return { start, end: todayStart };
 }
+
+/** 「前一日」= 报告日期的前一天（较昨日再早一个日历日），[start, end) */
+export function getDayBeforeYesterdayBoundsUtc(
+  now = new Date(),
+  timeZone = process.env.REPORT_TIMEZONE || DEFAULT_TZ
+): { label: string; start: Date; end: Date } {
+  const y = getYesterdayBoundsUtc(now, timeZone);
+  const start = addDays(y.start, -1);
+  const label = shanghaiYmd(start, timeZone);
+  return { label, start, end: y.start };
+}
+
+/** 将某 UTC 时刻按日历显示到该时区的 YYYY-MM-DD（用于按天列表） */
+export function calendarDateLabelInTz(
+  instant: Date,
+  timeZone = process.env.REPORT_TIMEZONE || DEFAULT_TZ
+): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(instant);
+}

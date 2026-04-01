@@ -10,6 +10,7 @@ import {
 } from "@/lib/daily-report-cleanup";
 import { sendMailSmtp } from "@/lib/email/smtp-send";
 import {
+  getDayBeforeYesterdayBoundsUtc,
   getLast7DaysBoundsUtc,
   getYesterdayBoundsUtc,
 } from "@/lib/report-timezone";
@@ -34,6 +35,7 @@ export async function runDailyReport(
   const tz = process.env.REPORT_TIMEZONE || "Asia/Shanghai";
   const yesterday = getYesterdayBoundsUtc(new Date(), tz);
   const last7 = getLast7DaysBoundsUtc(new Date(), tz);
+  const dayBeforeYesterday = getDayBeforeYesterdayBoundsUtc(new Date(), tz);
 
   if (!opts.test) {
     const c1 = await cleanupDailyReportJobLog(svc);
@@ -61,7 +63,13 @@ export async function runDailyReport(
     }
   }
 
-  const metrics = await collectDailyReportMetrics(svc, yesterday, last7);
+  const metrics = await collectDailyReportMetrics(
+    svc,
+    yesterday,
+    last7,
+    dayBeforeYesterday,
+    tz
+  );
 
   const to =
     process.env.DAILY_REPORT_TO || "wangmiao033@gmail.com";

@@ -7,6 +7,14 @@ export type SendMailInput = {
   html?: string;
 };
 
+/** 英文逗号分隔；trim；去空；单邮箱原样兼容 */
+export function parseDailyReportRecipients(raw: string): string[] {
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
 export async function sendMailSmtp(input: SendMailInput): Promise<{
   ok: boolean;
   message: string;
@@ -24,6 +32,14 @@ export async function sendMailSmtp(input: SendMailInput): Promise<{
     };
   }
 
+  const recipients = parseDailyReportRecipients(input.to);
+  if (recipients.length === 0) {
+    return {
+      ok: false,
+      message: "无有效收件人（请检查 DAILY_REPORT_TO）",
+    };
+  }
+
   const transporter = nodemailer.createTransport({
     host,
     port,
@@ -34,12 +50,12 @@ export async function sendMailSmtp(input: SendMailInput): Promise<{
   try {
     await transporter.sendMail({
       from,
-      to: input.to,
+      to: recipients,
       subject: input.subject,
       text: input.text,
       html: input.html,
     });
-    return { ok: true, message: "sent" };
+    return { ok: true, message: `sent to ${recipients.length} recipient(s)` };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return { ok: false, message: msg };

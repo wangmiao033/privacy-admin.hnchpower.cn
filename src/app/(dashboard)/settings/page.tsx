@@ -45,7 +45,9 @@ export default async function SettingsPage() {
               <code className="rounded bg-zinc-100 px-1 text-xs">
                 admin_visit_counts_svc
               </code>
-              （与仪表盘 / 统计页一致）。邮件仅汇总数字，无附件。
+              （与仪表盘 / 统计页一致）。邮件仅汇总数字与简要按天表，无附件。收件人环境变量{" "}
+              <code className="text-xs">DAILY_REPORT_TO</code>{" "}
+              支持英文逗号分隔多个邮箱。
             </p>
             <Separator />
             <div>
