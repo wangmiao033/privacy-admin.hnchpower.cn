@@ -8,6 +8,7 @@ import {
   BarChart3,
   ScrollText,
   FileText,
+  Images,
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ const items = [
   { href: "/users", label: "用户管理", icon: Users },
   { href: "/stats", label: "访问统计", icon: BarChart3 },
   { href: "/visits", label: "访问日志", icon: ScrollText },
+  { href: "/assets", label: "素材管理", icon: Images },
   { href: "/policies", label: "发布记录", icon: FileText },
   { href: "/settings", label: "设置", icon: Settings },
 ];
