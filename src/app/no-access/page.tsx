@@ -10,9 +10,12 @@ import {
 } from "@/components/ui/card";
 import { getProfileForUser, getSessionUser } from "@/lib/auth";
 
+const ALLOWED_ADMIN_EMAIL = "wangmiao@dxyx6888.com";
+
 export default async function NoAccessPage() {
   const user = await getSessionUser();
   const profile = user ? await getProfileForUser(user.id) : null;
+  const email = String(user?.email || "").trim().toLowerCase();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-100/60 px-4">
@@ -22,11 +25,13 @@ export default async function NoAccessPage() {
           <CardDescription>
             {!user
               ? "请先登录管理员账号。"
-              : profile?.role !== "admin"
-                ? "当前账号不是管理员（profiles.role ≠ admin）。"
-                : !profile?.is_active
-                  ? "管理员账号已被禁用。"
-                  : "无法访问后台。"}
+              : email !== ALLOWED_ADMIN_EMAIL
+                ? `该后台仅允许 ${ALLOWED_ADMIN_EMAIL} 登录。`
+                : profile?.role !== "admin"
+                  ? "当前账号未配置管理员权限。"
+                  : !profile?.is_active
+                    ? "管理员账号已被禁用。"
+                    : "无法访问后台。"}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row">
