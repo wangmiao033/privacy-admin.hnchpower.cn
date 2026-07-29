@@ -15,12 +15,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+const ALLOWED_ADMIN_EMAIL = "wangmiao@dxyx6888.com";
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/dashboard";
 
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,8 +32,8 @@ export function LoginForm() {
     setLoading(true);
     try {
       const supabase = createClient();
-      const { error: signErr } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+      const { data, error: signErr } = await supabase.auth.signInWithPassword({
+        email: ALLOWED_ADMIN_EMAIL,
         password,
       });
       if (signErr) {
@@ -40,6 +41,15 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
+
+      const signedInEmail = String(data.user?.email || "").trim().toLowerCase();
+      if (signedInEmail !== ALLOWED_ADMIN_EMAIL) {
+        await supabase.auth.signOut();
+        setError("该账号无权进入管理后台。");
+        setLoading(false);
+        return;
+      }
+
       router.refresh();
       router.push(nextPath.startsWith("/") ? nextPath : "/dashboard");
     } catch (err) {
@@ -53,7 +63,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle className="text-xl">管理员登录</CardTitle>
         <CardDescription>
-          使用 Supabase 邮箱与密码。仅 role 为 admin 的账号可进入后台。
+          仅允许 wangmiao@dxyx6888.com 登录管理后台。
         </CardDescription>
       </CardHeader>
       <form onSubmit={onSubmit}>
@@ -64,16 +74,14 @@ export function LoginForm() {
             </p>
           ) : null}
           <div className="space-y-2">
-            <Label htmlFor="email">邮箱</Label>
+            <Label htmlFor="email">管理员邮箱</Label>
             <Input
               id="email"
               name="email"
               type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
+              autoComplete="username"
+              readOnly
+              value={ALLOWED_ADMIN_EMAIL}
             />
           </div>
           <div className="space-y-2">
@@ -86,6 +94,7 @@ export function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoFocus
             />
           </div>
         </CardContent>
