@@ -9,7 +9,7 @@ type Props = {
 export function PoliciesLoadingShell({ email }: Props) {
   return (
     <>
-      <AdminHeader title="隐私政策发布记录" email={email} />
+      <AdminHeader title="隐私协议管理" email={email} />
       <main className="flex-1 space-y-6 p-6">
         <Card>
           <CardHeader>
