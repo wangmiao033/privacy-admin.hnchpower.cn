@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const ALLOWED_ADMIN_EMAIL = "wangmiao@dxyx6888.com";
+
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/users",
@@ -9,6 +11,10 @@ const PROTECTED_PREFIXES = [
   "/policies",
   "/settings",
 ];
+
+function isAllowedAdminEmail(email: string | null | undefined) {
+  return String(email || "").trim().toLowerCase() === ALLOWED_ADMIN_EMAIL;
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -49,9 +55,10 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+  const isAllowedUser = !!user && isAllowedAdminEmail(user.email);
 
   if (path.startsWith("/login")) {
-    if (user) {
+    if (isAllowedUser) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     return supabaseResponse;
@@ -65,6 +72,10 @@ export async function updateSession(request: NextRequest) {
     const login = new URL("/login", request.url);
     login.searchParams.set("next", path);
     return NextResponse.redirect(login);
+  }
+
+  if (isProtected && !isAllowedUser) {
+    return NextResponse.redirect(new URL("/no-access", request.url));
   }
 
   return supabaseResponse;
