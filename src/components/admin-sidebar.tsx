@@ -6,7 +6,6 @@ import {
   BarChart3,
   ExternalLink,
   FileText,
-  Images,
   LayoutDashboard,
   ScrollText,
   Settings,
@@ -30,10 +29,7 @@ const groups = [
   },
   {
     label: "内容管理",
-    items: [
-      { href: "/policies", label: "隐私协议", icon: FileText },
-      { href: "/assets", label: "素材管理", icon: Images },
-    ],
+    items: [{ href: "/policies", label: "隐私协议", icon: FileText }],
   },
   {
     label: "系统",
