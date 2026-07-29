@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Pencil } from "lucide-react";
 import { AdminHeader } from "@/components/admin-header";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -17,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PolicyDocumentsSearch } from "@/app/(dashboard)/policies/policy-documents-search";
 import { createServiceRoleClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/format";
@@ -42,7 +41,7 @@ export async function PoliciesTable({ email }: Props) {
         .from("document_policy_links")
         .select("id, short_code, title, created_at")
         .order("created_at", { ascending: false })
-        .limit(200)
+        .limit(500)
     : {
         data: null,
         error: {
@@ -61,7 +60,7 @@ export async function PoliciesTable({ email }: Props) {
           <CardHeader>
             <CardTitle>已发布隐私协议</CardTitle>
             <CardDescription>
-              可直接编辑标题和协议正文。保存后原审核链接保持不变，无需重新提交链接。
+              粘贴完整审核链接或输入文档编号即可搜索。保存修改后原审核链接保持不变。
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -77,61 +76,7 @@ export async function PoliciesTable({ email }: Props) {
                 </p>
               </div>
             ) : (
-              <div className="overflow-hidden rounded-lg border border-zinc-200">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>标题</TableHead>
-                      <TableHead>文档编号</TableHead>
-                      <TableHead>创建时间</TableHead>
-                      <TableHead>公开页面</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {documents.map((row) => {
-                      const publicUrl = `https://privacy.hnchpower.cn/document-policy.html?id=${encodeURIComponent(row.short_code)}`;
-                      return (
-                        <TableRow key={row.id}>
-                          <TableCell className="max-w-[300px] font-medium">
-                            <span className="block truncate" title={row.title || ""}>
-                              {row.title || "未命名隐私协议"}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs">
-                              {row.short_code}
-                            </code>
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap text-zinc-600">
-                            {formatDateTime(row.created_at)}
-                          </TableCell>
-                          <TableCell>
-                            <Button asChild size="sm" variant="outline">
-                              <Link
-                                href={publicUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <ExternalLink className="mr-1.5 h-4 w-4" />
-                                打开
-                              </Link>
-                            </Button>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button asChild size="sm">
-                              <Link href={`/policies/${encodeURIComponent(row.short_code)}/edit`}>
-                                <Pencil className="mr-1.5 h-4 w-4" />
-                                编辑内容
-                              </Link>
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+              <PolicyDocumentsSearch documents={documents} />
             )}
           </CardContent>
         </Card>
