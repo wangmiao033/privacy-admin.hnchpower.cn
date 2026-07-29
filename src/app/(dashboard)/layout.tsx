@@ -9,9 +9,9 @@ export default async function DashboardLayout({
   await requireAdmin();
 
   return (
-    <div className="flex min-h-screen bg-zinc-100/40">
+    <div className="min-h-screen bg-[#f3f5f7] text-zinc-950 lg:flex">
       <AdminSidebar />
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">{children}</div>
+      <div className="min-h-screen min-w-0 flex-1 overflow-x-hidden">{children}</div>
     </div>
   );
 }
